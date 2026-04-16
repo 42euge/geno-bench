@@ -1,15 +1,15 @@
 ---
 name: geno-bench
-description: Mine Claude Code session logs for failure patterns and abstract them into evaluation tasks. Use when the user asks to analyze their Claude Code sessions for recurring bugs, thrashing, error loops, or wants to build benchmarks grounded in real agent failures.
+description: Benchmark creation system that mines coding agent session logs for failure patterns and abstracts them into evaluation tasks. Currently supports Claude Code; planned expansion to Codex, Gemini CLI, and other coding tools. Use when the user asks to analyze agent sessions for recurring bugs, thrashing, error loops, or wants to build benchmarks grounded in real agent failures.
 license: MIT
 metadata:
   author: 42euge
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # geno-bench
 
-A workflow for mining failure patterns from Claude Code session logs and turning them into synthetic benchmark tasks.
+A benchmark creation system that mines coding agent session logs for failure patterns and turns them into synthetic evaluation tasks.
 
 ## When to use
 
@@ -22,7 +22,7 @@ Activate this skill when the user asks to:
 
 ## What it does
 
-Session mining extracts five signals from Claude Code JSONL logs:
+Session mining extracts five signals from coding agent JSONL logs:
 1. **Error patterns** — tool calls with failing results, grouped by type
 2. **Error streaks** — 3+ consecutive failures (evidence of no-progress loops)
 3. **Thrashing** — same resource accessed 3+ times (stuck state)
@@ -36,25 +36,25 @@ These become inputs for categorizing failures (stale state, retry without diagno
 When the user asks to mine their sessions:
 
 ### Step 1: Inventory
-Run `scripts/list_sessions.py` to see all sessions with their thrashing/error metrics. Filter to the most interesting ones (thrash > 0.3 OR errors > 10 AND tools > 20).
+Run `geno-list-sessions` to see all sessions with their thrashing/error metrics. Filter to the most interesting ones (thrash > 0.3 OR errors > 10 AND tools > 20).
 
 ```bash
-python3 scripts/list_sessions.py --min-thrash 0.3 --min-errors 10
+geno-list-sessions --min-thrash 0.3 --min-errors 10
 ```
 
 ### Step 2: Deep-dive on high-signal sessions
-For each interesting session, run `scripts/analyze_session.py <session_id>` to extract:
+For each interesting session, run `geno-analyze-session <session_id>` to extract:
 - Error pattern counts
 - Thrashing details (what file/command was re-accessed)
 - Tool frequency
 - Error streaks (3+ consecutive failures)
 
 ```bash
-python3 scripts/analyze_session.py <session_id_prefix>
+geno-analyze-session <session_id_prefix>
 ```
 
 ### Step 3: Write up findings
-For each analyzed session, write a markdown note in `session_mining/` using the template at `templates/session_note.md`. Name it `{YYYY-MM-DD}_{project-slug}_{session_id_prefix}.md`.
+For each analyzed session, write a markdown note in `session_mining/` using the template at `geno_bench/templates/session_note.md`. Name it `{YYYY-MM-DD}_{project-slug}_{session_id_prefix}.md`.
 
 Each note should cover:
 - Session metadata (id, project, turns, tools, errors, thrashing)
@@ -68,7 +68,7 @@ Each note should cover:
 **Critical:** Focus on failure TYPES that are novel. Once you've seen stale-ref thrashing in one session, note its recurrence but don't re-explain it in every subsequent note.
 
 ### Step 4: Build a task catalog (optional)
-Once you've mined 5+ sessions across different projects, use `templates/task_catalog.md` to organize the failure types into benchmark task designs. Each task should:
+Once you've mined 5+ sessions across different projects, use `geno_bench/templates/task_catalog.md` to organize the failure types into benchmark task designs. Each task should:
 - Name the failure it targets
 - Map to a cognitive sub-ability (concept formation, associative learning, etc.)
 - Describe a synthetic pre/study/post paradigm that tests whether models can learn from examples of the failure

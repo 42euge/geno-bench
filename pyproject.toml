@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geno-bench"
+version = "0.2.0"
+description = "Benchmark creation system — mines coding agent session logs for failure-grounded evaluation tasks"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [{name = "Eugenio Rivera Ramos"}]
+
+[project.urls]
+Repository = "https://github.com/42euge/geno-bench"
+
+[project.scripts]
+geno-list-sessions = "geno_bench.cli.list_sessions:main"
+geno-analyze-session = "geno_bench.cli.analyze_session:main"
+
+[tool.setuptools.package-data]
+geno_bench = ["templates/**/*", "examples/**/*"]

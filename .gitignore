@@ -4,4 +4,6 @@ __pycache__/
 .venv/
 venv/
 session_mining/
-!examples/
+dist/
+*.egg-info/
+build/

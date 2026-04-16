@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Deep-dive analysis of a single Claude Code session.
+"""Deep-dive analysis of a single coding agent session.
 
 Extracts: error patterns, thrashing details, tool distribution,
 error streaks. Output is plain text ready to paste into a mining
 note (or pipe into a markdown file).
 
 Usage:
-    python3 analyze_session.py <session_id_prefix>
-    python3 analyze_session.py 17446aea
-    python3 analyze_session.py /path/to/session.jsonl
+    geno-analyze-session <session_id_prefix>
+    geno-analyze-session 17446aea
+    geno-analyze-session /path/to/session.jsonl
 """
 
 from __future__ import annotations
@@ -17,8 +17,14 @@ import argparse
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
-from _parser import discover_sessions, parse_session, thrashing_score
+from geno_bench.parser import discover_sessions, parse_session, thrashing_score
+
+
+def _short_project(project: str) -> str:
+    s = project.replace("-Users-", "").replace("-", "/").lstrip("/")
+    if s.startswith("euge/"):
+        s = s[len("euge/") :]
+    return s
 
 
 def main() -> int:
@@ -88,7 +94,6 @@ def _print_error_patterns(session, top_n):
     print("| Count | Tool + Error |")
     print("|---|---|")
     for k, v in sorted(patterns.items(), key=lambda x: -x[1])[:top_n]:
-        # Escape pipe chars for markdown
         k_safe = k.replace("|", "\\|")
         print(f"| {v} | {k_safe} |")
     print()
@@ -153,13 +158,6 @@ def _print_error_streaks(session, min_len, max_show):
         if len(streak) > 5:
             print(f"- ... +{len(streak) - 5} more")
         print()
-
-
-def _short_project(project: str) -> str:
-    s = project.replace("-Users-", "").replace("-", "/").lstrip("/")
-    if s.startswith("euge/"):
-        s = s[len("euge/") :]
-    return s
 
 
 if __name__ == "__main__":

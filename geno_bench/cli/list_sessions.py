@@ -6,19 +6,27 @@ of agent trouble: high thrashing score, many errors, or long tool
 loops. Output is sorted by a rough "interestingness" score.
 
 Usage:
-    python3 list_sessions.py
-    python3 list_sessions.py --min-thrash 0.3 --min-errors 10
-    python3 list_sessions.py --project-filter learning
+    geno-list-sessions
+    geno-list-sessions --min-thrash 0.3 --min-errors 10
+    geno-list-sessions --project-filter learning
 """
 
 from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
-from _parser import discover_sessions, parse_session, thrashing_score
+from geno_bench.parser import discover_sessions, parse_session, thrashing_score
+
+
+def _short_project(project: str) -> str:
+    """Shorten the project dir name."""
+    # Claude projects encode paths as -Users-euge-code-foo
+    s = project.replace("-Users-", "").replace("-", "/").lstrip("/")
+    # Collapse leading user segment
+    if s.startswith("euge/"):
+        s = s[len("euge/") :]
+    return s
 
 
 def main() -> int:
@@ -95,16 +103,6 @@ def main() -> int:
         )
     print(f"\n{len(rows)} sessions shown.")
     return 0
-
-
-def _short_project(project: str) -> str:
-    """Shorten the project dir name."""
-    # Claude projects encode paths as -Users-euge-code-foo
-    s = project.replace("-Users-", "").replace("-", "/").lstrip("/")
-    # Collapse leading user segment
-    if s.startswith("euge/"):
-        s = s[len("euge/") :]
-    return s
 
 
 if __name__ == "__main__":
