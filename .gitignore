@@ -1,0 +1,7 @@
+__pycache__/
+*.py[co]
+.DS_Store
+.venv/
+venv/
+session_mining/
+!examples/
