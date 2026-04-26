@@ -1,22 +1,22 @@
 # geno-bench
 
-Benchmark creation system that mines coding agent session logs for failure patterns and turns them into evaluation tasks. Currently supports Claude Code, with planned expansion to other coding tools (Codex, Gemini CLI, etc.).
+Benchmark creation system that mines coding agent session logs for failure patterns and turns them into evaluation tasks.
 
 ## Install
 
 ```bash
-pip install git+https://github.com/42euge/geno-bench.git
+geno-tools install geno-bench
 ```
 
-Or install as a Claude Code skill:
+Or from within an agent session:
 
-```bash
-npx skills add 42euge/geno-bench -g -a claude-code -y
+```
+/geno-tools install geno-bench
 ```
 
 ## What it does
 
-Coding agents store session logs (Claude Code uses JSONL at `~/.claude/projects/`). Those logs contain every tool call, error, retry, and back-and-forth. geno-bench provides:
+Coding agents store session logs as JSONL (e.g. `~/.claude/projects/` for Claude Code). Those logs contain every tool call, error, retry, and back-and-forth. geno-bench provides:
 
 1. **Scripts** to scan sessions and surface ones with evidence of agent failure (high thrashing, many errors, long loops)
 2. **Analysis** to extract per-session failure patterns (error streaks, repeated resource access, tool distribution)
@@ -54,9 +54,14 @@ score, details = thrashing_score(session)
 ```
 geno-bench/
 ├── pyproject.toml
-├── SKILL.md                          # skill definition (for npx skills installer)
+├── SKILL.md                          # umbrella skill manifest
+├── genotools.yaml                    # geno-tools manifest
+├── GENO.md                           # agent instructions
 ├── README.md
 ├── LICENSE
+├── skills/
+│   └── geno-bench/SKILL.md           # umbrella skill definition
+├── docs/                             # MkDocs Material site
 └── geno_bench/
     ├── __init__.py                   # public API
     ├── parser.py                     # JSONL parsing + analysis
@@ -72,15 +77,15 @@ geno-bench/
 
 ## Philosophy
 
-LLM benchmarks usually test knowledge recall on static datasets. This tool builds benchmarks that test whether models can **learn from observed failures** — specifically, the kinds of failures that actually occur in agentic coding tools.
+LLM benchmarks usually test knowledge recall on static datasets. This tool builds benchmarks that test whether models can **learn from observed failures** -- specifically, the kinds of failures that actually occur in agentic coding sessions.
 
 The failure taxonomy that emerges tends to cluster around a handful of cognitive gaps:
-- **Stale state recovery** — retrying with invalidated references
-- **Retry without diagnosis** — hitting the same error repeatedly without updating strategy
-- **Tool-task mismatch** — using a fragile approach when a stable one exists
-- **Warning vs error confusion** — treating non-blocking output as blocking
-- **Precondition blindness** — mutating without checking current state
-- **Strategy over-commitment** — not pivoting when the current approach plateaus
+- **Stale state recovery** -- retrying with invalidated references
+- **Retry without diagnosis** -- hitting the same error repeatedly without updating strategy
+- **Tool-task mismatch** -- using a fragile approach when a stable one exists
+- **Warning vs error confusion** -- treating non-blocking output as blocking
+- **Precondition blindness** -- mutating without checking current state
+- **Strategy over-commitment** -- not pivoting when the current approach plateaus
 
 These map naturally to cognitive sub-abilities from learning science and can be instantiated as synthetic benchmark tasks.
 
