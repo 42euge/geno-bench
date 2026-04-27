@@ -1,0 +1,10 @@
+name: bench
+version: "0.2.0"
+description: >-
+  Benchmark creation system that mines coding agent session logs for failure
+  patterns and turns them into evaluation tasks.
+
+venv:
+  name: geno-bench
+  deps:
+    - "."
