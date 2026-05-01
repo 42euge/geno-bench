@@ -23,9 +23,7 @@ geno-bench/
 │       └── SKILL.md
 ├── docs/                # MkDocs Material site
 │   ├── index.md
-│   ├── getting-started.md
-│   └── assets/
-│       └── icon.png
+│   └── getting-started.md
 ├── mkdocs.yml           # docs site config
 └── geno_bench/          # Python package
     ├── __init__.py      # public API (Session, parse_session, discover_sessions, thrashing_score)
@@ -43,6 +41,8 @@ geno-bench/
 ## Conventions
 
 - **Skill naming**: skills follow the `geno-bench-{sub-skillset}-{skill}` pattern per the geno-tools nomenclature spec.
+- **Prefix aliasing**: the canonical slash command prefix is `/geno-bench-*`. The short alias `/gt-bench-*` is registered for convenience. Both forms resolve to the same skill. Aliases are declared in each skill's `SKILL.md` front-matter under `aliases:`.
+- **Adding a new skill**: create `skills/<sub-skillset>/SKILL.md` with the required front-matter (`name`, `description`, `aliases`). Add a row to the Skills table above. If the skill needs Python, add an entry point in `pyproject.toml` under `[project.scripts]`.
 - **No third-party dependencies**: the Python package uses only the standard library.
 - **Session data privacy**: never commit raw session data to the repo. Mining notes reference session IDs and counts, not raw content.
 
@@ -63,7 +63,7 @@ The parser extracts five signals:
 
 ### CLI entry points
 
-- `geno-list-sessions` -- scans `~/.claude/projects/**/*.jsonl`, surfaces sessions with high thrashing/errors
+- `geno-list-sessions` -- scans agent session log directories (e.g. `~/.claude/projects/**/*.jsonl` for Claude Code; other agents may store logs elsewhere), surfaces sessions with high thrashing/errors
 - `geno-analyze-session <id>` -- deep-dive on a single session, outputs markdown-formatted analysis
 
 ### Python API

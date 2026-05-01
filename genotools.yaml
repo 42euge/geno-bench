@@ -1,4 +1,4 @@
-name: bench
+name: geno-bench
 version: "0.2.0"
 description: >-
   Benchmark creation system that mines coding agent session logs for failure
